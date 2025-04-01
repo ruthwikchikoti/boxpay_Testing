@@ -132,7 +132,12 @@
             loader.style.display = 'block';
             
             try {
-                const response = await fetch('/api/payments/create-session', {
+                // Use the full URL for API calls when deployed to Vercel
+                const apiUrl = window.location.hostname === 'localhost' 
+                    ? '/api/payments/create-session'
+                    : 'https://boxpay-testing.vercel.app/api/payments/create-session';
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -147,7 +152,18 @@
                     }),
                 });
                 
-                const data = await response.json();
+                // Check content type before parsing JSON
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    // If not JSON, get text and show an appropriate error
+                    const text = await response.text();
+                    console.error('Received non-JSON response:', text);
+                    throw new Error('Server returned an invalid response format');
+                }
                 
                 if (!response.ok) {
                     throw new Error(data.message || 'Failed to create payment session');
