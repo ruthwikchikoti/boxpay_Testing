@@ -132,11 +132,11 @@
             loader.style.display = 'block';
             
             try {
-                // Use the full URL for API calls when deployed to Vercel
-                const apiUrl = window.location.hostname === 'localhost' 
-                    ? '/api/payments/create-session'
-                    : 'https://boxpay-testing.vercel.app/api/payments/create-session';
+                // Always use the same domain for API requests
+                const apiUrl = '/api/payments/create-session';
 
+                console.log("Sending request to:", apiUrl);
+                
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
@@ -175,6 +175,8 @@
                 // Show success message
                 successMessage.textContent = 'Redirecting to payment page...';
                 successMessage.style.display = 'block';
+                
+                console.log("Payment URL:", data.redirectUrl);
                 
                 // Redirect to payment page
                 setTimeout(() => {
